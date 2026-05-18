@@ -1,0 +1,526 @@
+mysql> -- CREATE DATABASE
+mysql> CREATE DATABASE IF NOT EXISTS atm_management_db;
+Query OK, 1 row affected, 1 warning (0.01 sec)
+
+mysql> USE atm_management_db;
+Database changed
+mysql> 
+mysql> -- TABLE 1: BANKS
+mysql> CREATE TABLE Banks (
+    ->     bank_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     bank_name VARCHAR(100) NOT NULL,
+    ->     branch_name VARCHAR(100),
+    ->     city VARCHAR(50)
+    -> );
+ERROR 1050 (42S01): Table 'banks' already exists
+mysql> 
+mysql> -- TABLE 2: CUSTOMERS
+mysql> CREATE TABLE Customers (
+    ->     customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     customer_name VARCHAR(100) NOT NULL,
+    ->     email VARCHAR(100) UNIQUE,
+    ->     phone VARCHAR(15),
+    ->     address VARCHAR(200),
+    ->     join_date DATE
+    -> );
+ERROR 1050 (42S01): Table 'customers' already exists
+mysql> 
+mysql> -- TABLE 3: ACCOUNTS
+mysql> CREATE TABLE Accounts (
+    ->     account_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     customer_id INT,
+    ->     bank_id INT,
+    ->     account_type VARCHAR(50),
+    ->     balance DECIMAL(12,2),
+    ->     account_status VARCHAR(20),
+    ->     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    ->     FOREIGN KEY (bank_id) REFERENCES Banks(bank_id)
+    -> );
+ERROR 1050 (42S01): Table 'accounts' already exists
+mysql> 
+mysql> -- TABLE 4: ATM_MACHINES
+mysql> CREATE TABLE ATM_Machines (
+    ->     atm_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     bank_id INT,
+    ->     location VARCHAR(150),
+    ->     city VARCHAR(50),
+    ->     cash_available DECIMAL(12,2),
+    ->     FOREIGN KEY (bank_id) REFERENCES Banks(bank_id)
+    -> );
+ERROR 1050 (42S01): Table 'atm_machines' already exists
+mysql> 
+mysql> -- TABLE 5: CARDS
+mysql> CREATE TABLE Cards (
+    ->     card_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     account_id INT,
+    ->     card_number VARCHAR(20) UNIQUE,
+    ->     card_type VARCHAR(20),
+    ->     expiry_date DATE,
+    ->     pin_code INT,
+    ->     FOREIGN KEY (account_id) REFERENCES Accounts(account_id)
+    -> );
+ERROR 1050 (42S01): Table 'cards' already exists
+mysql> 
+mysql> -- TABLE 6: TRANSACTIONS
+mysql> CREATE TABLE Transactions (
+    ->     transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     account_id INT,
+    ->     atm_id INT,
+    ->     transaction_type VARCHAR(50),
+    ->     amount DECIMAL(10,2),
+    ->     transaction_date DATETIME,
+    ->     FOREIGN KEY (account_id) REFERENCES Accounts(account_id),
+    ->     FOREIGN KEY (atm_id) REFERENCES ATM_Machines(atm_id)
+    -> );
+ERROR 1050 (42S01): Table 'transactions' already exists
+mysql> 
+mysql> -- BANKS DATA
+mysql> INSERT INTO Banks (bank_name, branch_name, city) VALUES
+    -> ('State Bank of India', 'MG Road Branch', 'Hyderabad'),
+    -> ('HDFC Bank', 'Banjara Hills Branch', 'Hyderabad'),
+    -> ('ICICI Bank', 'Connaught Place Branch', 'Delhi'),
+    -> ('Axis Bank', 'Anna Nagar Branch', 'Chennai'),
+    -> ('Punjab National Bank', 'Hazratganj Branch', 'Lucknow'),
+    -> ('Canara Bank', 'Jayanagar Branch', 'Bangalore'),
+    -> ('Bank of Baroda', 'Civil Lines Branch', 'Jaipur'),
+    -> ('Union Bank of India', 'MVP Colony Branch', 'Visakhapatnam');
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- CUSTOMERS DATA
+mysql> INSERT INTO Customers (customer_name, email, phone, address, join_date) VALUES
+    -> ('Rahul Sharma', 'rahul@gmail.com', '9876543210', 'Hyderabad', '2023-01-15'),
+    -> ('Sneha Patel', 'sneha@yahoo.com', '9876501234', 'Ahmedabad', '2023-02-20'),
+    -> ('Kiran Reddy', 'kiran@outlook.com', '9988776655', 'Visakhapatnam', '2023-03-12'),
+    -> ('Priya Gupta', 'priya@gmail.com', '9123456780', 'Delhi', '2023-04-05'),
+    -> ('Amit Kumar', 'amit@gmail.com', '9012345678', 'Lucknow', '2024-01-10'),
+    -> ('Neha Singh', 'neha@yahoo.com', '9090909090', 'Jaipur', '2024-02-18'),
+    -> ('Vikram Rao', 'vikram@outlook.com', '9345678901', 'Bangalore', '2024-03-22'),
+    -> ('Divya Joshi', 'divya@gmail.com', '9871234567', 'Chennai', '2024-04-15');
+ERROR 1062 (23000): Duplicate entry 'rahul@gmail.com' for key 'customers.email'
+mysql> 
+mysql> -- ACCOUNTS DATA
+mysql> INSERT INTO Accounts (customer_id, bank_id, account_type, balance, account_status) VALUES
+    -> (1, 1, 'Savings', 25000.00, 'Active'),
+    -> (2, 2, 'Current', 40000.00, 'Active'),
+    -> (3, 1, 'Savings', 15000.00, 'Active'),
+    -> (4, 3, 'Savings', 30000.00, 'Active'),
+    -> (5, 5, 'Current', 55000.00, 'Active'),
+    -> (6, 7, 'Savings', 20000.00, 'Inactive'),
+    -> (7, 6, 'Savings', 45000.00, 'Active'),
+    -> (8, 4, 'Current', 60000.00, 'Active');
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- ATM MACHINES DATA
+mysql> INSERT INTO ATM_Machines (bank_id, location, city, cash_available) VALUES
+    -> (1, 'MG Road ATM', 'Hyderabad', 500000.00),
+    -> (2, 'Banjara Hills ATM', 'Hyderabad', 400000.00),
+    -> (3, 'CP Metro ATM', 'Delhi', 350000.00),
+    -> (4, 'Anna Nagar ATM', 'Chennai', 300000.00),
+    -> (5, 'Hazratganj ATM', 'Lucknow', 250000.00),
+    -> (6, 'Jayanagar ATM', 'Bangalore', 450000.00),
+    -> (7, 'Civil Lines ATM', 'Jaipur', 200000.00),
+    -> (8, 'MVP Colony ATM', 'Visakhapatnam', 500000.00);
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- CARDS DATA
+mysql> INSERT INTO Cards (account_id, card_number, card_type, expiry_date, pin_code) VALUES
+    -> (1, '4567123412341111', 'Debit', '2028-05-31', 1234),
+    -> (2, '4567123412342222', 'Debit', '2027-07-31', 2345),
+    -> (3, '4567123412343333', 'Credit', '2029-03-31', 3456),
+    -> (4, '4567123412344444', 'Debit', '2026-11-30', 4567),
+    -> (5, '4567123412345555', 'Credit', '2028-09-30', 5678),
+    -> (6, '4567123412346666', 'Debit', '2027-12-31', 6789),
+    -> (7, '4567123412347777', 'Debit', '2029-01-31', 7890),
+    -> (8, '4567123412348888', 'Credit', '2030-06-30', 8901);
+ERROR 1062 (23000): Duplicate entry '4567123412341111' for key 'cards.card_number'
+mysql> 
+mysql> -- TRANSACTIONS DATA
+mysql> INSERT INTO Transactions 
+    -> (account_id, atm_id, transaction_type, amount, transaction_date) VALUES
+    -> (1, 1, 'Withdrawal', 2000.00, '2024-01-10 10:30:00'),
+    -> (2, 2, 'Deposit', 5000.00, '2024-01-12 12:15:00'),
+    -> (3, 8, 'Balance Check', 0.00, '2024-01-15 09:00:00'),
+    -> (4, 3, 'Withdrawal', 3000.00, '2024-02-01 14:20:00'),
+    -> (5, 5, 'Deposit', 10000.00, '2024-02-10 16:45:00'),
+    -> (6, 7, 'Withdrawal', 1500.00, '2024-03-05 11:10:00'),
+    -> (7, 6, 'Balance Check', 0.00, '2024-03-18 18:30:00'),
+    -> (8, 4, 'Withdrawal', 2500.00, '2024-04-01 20:00:00');
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- VERIFY DATA
+mysql> SELECT * FROM Banks;
++---------+----------------------+------------------------+---------------+
+| bank_id | bank_name            | branch_name            | city          |
++---------+----------------------+------------------------+---------------+
+|       1 | State Bank of India  | MG Road Branch         | Hyderabad     |
+|       2 | HDFC Bank            | Banjara Hills Branch   | Hyderabad     |
+|       3 | ICICI Bank           | Connaught Place Branch | Delhi         |
+|       4 | Axis Bank            | Anna Nagar Branch      | Chennai       |
+|       5 | Punjab National Bank | Hazratganj Branch      | Lucknow       |
+|       6 | Canara Bank          | Jayanagar Branch       | Bangalore     |
+|       7 | Bank of Baroda       | Civil Lines Branch     | Jaipur        |
+|       8 | Union Bank of India  | MVP Colony Branch      | Visakhapatnam |
+|       9 | State Bank of India  | MG Road Branch         | Hyderabad     |
+|      10 | HDFC Bank            | Banjara Hills Branch   | Hyderabad     |
+|      11 | ICICI Bank           | Connaught Place Branch | Delhi         |
+|      12 | Axis Bank            | Anna Nagar Branch      | Chennai       |
+|      13 | Punjab National Bank | Hazratganj Branch      | Lucknow       |
+|      14 | Canara Bank          | Jayanagar Branch       | Bangalore     |
+|      15 | Bank of Baroda       | Civil Lines Branch     | Jaipur        |
+|      16 | Union Bank of India  | MVP Colony Branch      | Visakhapatnam |
++---------+----------------------+------------------------+---------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Customers;
++-------------+---------------+--------------------+------------+---------------+------------+
+| customer_id | customer_name | email              | phone      | address       | join_date  |
++-------------+---------------+--------------------+------------+---------------+------------+
+|           1 | Rahul Sharma  | rahul@gmail.com    | 9876543210 | Hyderabad     | 2023-01-15 |
+|           2 | Sneha Patel   | sneha@yahoo.com    | 9876501234 | Ahmedabad     | 2023-02-20 |
+|           3 | Kiran Reddy   | kiran@outlook.com  | 9988776655 | Visakhapatnam | 2023-03-12 |
+|           4 | Priya Gupta   | priya@gmail.com    | 9123456780 | Delhi         | 2023-04-05 |
+|           5 | Amit Kumar    | amit@gmail.com     | 9012345678 | Lucknow       | 2024-01-10 |
+|           6 | Neha Singh    | neha@yahoo.com     | 9090909090 | Jaipur        | 2024-02-18 |
+|           7 | Vikram Rao    | vikram@outlook.com | 9345678901 | Bangalore     | 2024-03-22 |
+|           8 | Divya Joshi   | divya@gmail.com    | 9871234567 | Chennai       | 2024-04-15 |
++-------------+---------------+--------------------+------------+---------------+------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Accounts;
++------------+-------------+---------+--------------+----------+----------------+
+| account_id | customer_id | bank_id | account_type | balance  | account_status |
++------------+-------------+---------+--------------+----------+----------------+
+|          1 |           1 |       1 | Savings      | 25000.00 | Active         |
+|          2 |           2 |       2 | Current      | 40000.00 | Active         |
+|          3 |           3 |       1 | Savings      | 15000.00 | Active         |
+|          4 |           4 |       3 | Savings      | 30000.00 | Active         |
+|          5 |           5 |       5 | Current      | 55000.00 | Active         |
+|          6 |           6 |       7 | Savings      | 20000.00 | Inactive       |
+|          7 |           7 |       6 | Savings      | 45000.00 | Active         |
+|          8 |           8 |       4 | Current      | 60000.00 | Active         |
+|          9 |           1 |       1 | Savings      | 25000.00 | Active         |
+|         10 |           2 |       2 | Current      | 40000.00 | Active         |
+|         11 |           3 |       1 | Savings      | 15000.00 | Active         |
+|         12 |           4 |       3 | Savings      | 30000.00 | Active         |
+|         13 |           5 |       5 | Current      | 55000.00 | Active         |
+|         14 |           6 |       7 | Savings      | 20000.00 | Inactive       |
+|         15 |           7 |       6 | Savings      | 45000.00 | Active         |
+|         16 |           8 |       4 | Current      | 60000.00 | Active         |
++------------+-------------+---------+--------------+----------+----------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM ATM_Machines;
++--------+---------+-------------------+---------------+----------------+
+| atm_id | bank_id | location          | city          | cash_available |
++--------+---------+-------------------+---------------+----------------+
+|      1 |       1 | MG Road ATM       | Hyderabad     |      500000.00 |
+|      2 |       2 | Banjara Hills ATM | Hyderabad     |      400000.00 |
+|      3 |       3 | CP Metro ATM      | Delhi         |      350000.00 |
+|      4 |       4 | Anna Nagar ATM    | Chennai       |      300000.00 |
+|      5 |       5 | Hazratganj ATM    | Lucknow       |      250000.00 |
+|      6 |       6 | Jayanagar ATM     | Bangalore     |      450000.00 |
+|      7 |       7 | Civil Lines ATM   | Jaipur        |      200000.00 |
+|      8 |       8 | MVP Colony ATM    | Visakhapatnam |      500000.00 |
+|      9 |       1 | MG Road ATM       | Hyderabad     |      500000.00 |
+|     10 |       2 | Banjara Hills ATM | Hyderabad     |      400000.00 |
+|     11 |       3 | CP Metro ATM      | Delhi         |      350000.00 |
+|     12 |       4 | Anna Nagar ATM    | Chennai       |      300000.00 |
+|     13 |       5 | Hazratganj ATM    | Lucknow       |      250000.00 |
+|     14 |       6 | Jayanagar ATM     | Bangalore     |      450000.00 |
+|     15 |       7 | Civil Lines ATM   | Jaipur        |      200000.00 |
+|     16 |       8 | MVP Colony ATM    | Visakhapatnam |      500000.00 |
++--------+---------+-------------------+---------------+----------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Cards;
++---------+------------+------------------+-----------+-------------+----------+
+| card_id | account_id | card_number      | card_type | expiry_date | pin_code |
++---------+------------+------------------+-----------+-------------+----------+
+|       1 |          1 | 4567123412341111 | Debit     | 2028-05-31  |     1234 |
+|       2 |          2 | 4567123412342222 | Debit     | 2027-07-31  |     2345 |
+|       3 |          3 | 4567123412343333 | Credit    | 2029-03-31  |     3456 |
+|       4 |          4 | 4567123412344444 | Debit     | 2026-11-30  |     4567 |
+|       5 |          5 | 4567123412345555 | Credit    | 2028-09-30  |     5678 |
+|       6 |          6 | 4567123412346666 | Debit     | 2027-12-31  |     6789 |
+|       7 |          7 | 4567123412347777 | Debit     | 2029-01-31  |     7890 |
+|       8 |          8 | 4567123412348888 | Credit    | 2030-06-30  |     8901 |
++---------+------------+------------------+-----------+-------------+----------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Transactions;
++----------------+------------+--------+------------------+----------+---------------------+
+| transaction_id | account_id | atm_id | transaction_type | amount   | transaction_date    |
++----------------+------------+--------+------------------+----------+---------------------+
+|              1 |          1 |      1 | Withdrawal       |  2000.00 | 2024-01-10 10:30:00 |
+|              2 |          2 |      2 | Deposit          |  5000.00 | 2024-01-12 12:15:00 |
+|              3 |          3 |      8 | Balance Check    |     0.00 | 2024-01-15 09:00:00 |
+|              4 |          4 |      3 | Withdrawal       |  3000.00 | 2024-02-01 14:20:00 |
+|              5 |          5 |      5 | Deposit          | 10000.00 | 2024-02-10 16:45:00 |
+|              6 |          6 |      7 | Withdrawal       |  1500.00 | 2024-03-05 11:10:00 |
+|              7 |          7 |      6 | Balance Check    |     0.00 | 2024-03-18 18:30:00 |
+|              8 |          8 |      4 | Withdrawal       |  2500.00 | 2024-04-01 20:00:00 |
+|              9 |          1 |      1 | Withdrawal       |  2000.00 | 2024-01-10 10:30:00 |
+|             10 |          2 |      2 | Deposit          |  5000.00 | 2024-01-12 12:15:00 |
+|             11 |          3 |      8 | Balance Check    |     0.00 | 2024-01-15 09:00:00 |
+|             12 |          4 |      3 | Withdrawal       |  3000.00 | 2024-02-01 14:20:00 |
+|             13 |          5 |      5 | Deposit          | 10000.00 | 2024-02-10 16:45:00 |
+|             14 |          6 |      7 | Withdrawal       |  1500.00 | 2024-03-05 11:10:00 |
+|             15 |          7 |      6 | Balance Check    |     0.00 | 2024-03-18 18:30:00 |
+|             16 |          8 |      4 | Withdrawal       |  2500.00 | 2024-04-01 20:00:00 |
++----------------+------------+--------+------------------+----------+---------------------+
+16 rows in set (0.00 sec)
+
+mysql> -- 1. Display all customers whose account balance is greater than 30000
+mysql> SELECT * 
+    -> FROM Accounts
+    -> WHERE balance > 30000;
++------------+-------------+---------+--------------+----------+----------------+
+| account_id | customer_id | bank_id | account_type | balance  | account_status |
++------------+-------------+---------+--------------+----------+----------------+
+|          2 |           2 |       2 | Current      | 40000.00 | Active         |
+|          5 |           5 |       5 | Current      | 55000.00 | Active         |
+|          7 |           7 |       6 | Savings      | 45000.00 | Active         |
+|          8 |           8 |       4 | Current      | 60000.00 | Active         |
+|         10 |           2 |       2 | Current      | 40000.00 | Active         |
+|         13 |           5 |       5 | Current      | 55000.00 | Active         |
+|         15 |           7 |       6 | Savings      | 45000.00 | Active         |
+|         16 |           8 |       4 | Current      | 60000.00 | Active         |
++------------+-------------+---------+--------------+----------+----------------+
+8 rows in set (0.01 sec)
+
+mysql> 
+mysql> -- 2. Show ATM machines where cash available is less than 400000
+mysql> SELECT * 
+    -> FROM ATM_Machines
+    -> WHERE cash_available < 400000;
++--------+---------+-----------------+---------+----------------+
+| atm_id | bank_id | location        | city    | cash_available |
++--------+---------+-----------------+---------+----------------+
+|      3 |       3 | CP Metro ATM    | Delhi   |      350000.00 |
+|      4 |       4 | Anna Nagar ATM  | Chennai |      300000.00 |
+|      5 |       5 | Hazratganj ATM  | Lucknow |      250000.00 |
+|      7 |       7 | Civil Lines ATM | Jaipur  |      200000.00 |
+|     11 |       3 | CP Metro ATM    | Delhi   |      350000.00 |
+|     12 |       4 | Anna Nagar ATM  | Chennai |      300000.00 |
+|     13 |       5 | Hazratganj ATM  | Lucknow |      250000.00 |
+|     15 |       7 | Civil Lines ATM | Jaipur  |      200000.00 |
++--------+---------+-----------------+---------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 3. Display transaction amount after adding 5% service charge
+mysql> SELECT transaction_id,
+    ->        amount,
+    ->        amount + (amount * 0.05) AS amount_with_charge
+    -> FROM Transactions;
++----------------+----------+--------------------+
+| transaction_id | amount   | amount_with_charge |
++----------------+----------+--------------------+
+|              1 |  2000.00 |          2100.0000 |
+|              2 |  5000.00 |          5250.0000 |
+|              3 |     0.00 |             0.0000 |
+|              4 |  3000.00 |          3150.0000 |
+|              5 | 10000.00 |         10500.0000 |
+|              6 |  1500.00 |          1575.0000 |
+|              7 |     0.00 |             0.0000 |
+|              8 |  2500.00 |          2625.0000 |
+|              9 |  2000.00 |          2100.0000 |
+|             10 |  5000.00 |          5250.0000 |
+|             11 |     0.00 |             0.0000 |
+|             12 |  3000.00 |          3150.0000 |
+|             13 | 10000.00 |         10500.0000 |
+|             14 |  1500.00 |          1575.0000 |
+|             15 |     0.00 |             0.0000 |
+|             16 |  2500.00 |          2625.0000 |
++----------------+----------+--------------------+
+16 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 4. Show accounts with yearly estimated interest of 4%
+mysql> SELECT account_id,
+    ->        balance,
+    ->        balance * 0.04 AS yearly_interest
+    -> FROM Accounts;
++------------+----------+-----------------+
+| account_id | balance  | yearly_interest |
++------------+----------+-----------------+
+|          1 | 25000.00 |       1000.0000 |
+|          2 | 40000.00 |       1600.0000 |
+|          3 | 15000.00 |        600.0000 |
+|          4 | 30000.00 |       1200.0000 |
+|          5 | 55000.00 |       2200.0000 |
+|          6 | 20000.00 |        800.0000 |
+|          7 | 45000.00 |       1800.0000 |
+|          8 | 60000.00 |       2400.0000 |
+|          9 | 25000.00 |       1000.0000 |
+|         10 | 40000.00 |       1600.0000 |
+|         11 | 15000.00 |        600.0000 |
+|         12 | 30000.00 |       1200.0000 |
+|         13 | 55000.00 |       2200.0000 |
+|         14 | 20000.00 |        800.0000 |
+|         15 | 45000.00 |       1800.0000 |
+|         16 | 60000.00 |       2400.0000 |
++------------+----------+-----------------+
+16 rows in set (0.00 sec)
+
+mysql> -- 5. Find total balance available in all accounts
+mysql> SELECT SUM(balance) AS total_bank_balance
+    -> FROM Accounts;
++--------------------+
+| total_bank_balance |
++--------------------+
+|          580000.00 |
++--------------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> -- 6. Find average transaction amount
+mysql> SELECT AVG(amount) AS average_transaction
+    -> FROM Transactions;
++---------------------+
+| average_transaction |
++---------------------+
+|         3000.000000 |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> -- 7. Count total number of customers city-wise
+mysql> SELECT address,
+    ->        COUNT(customer_id) AS total_customers
+    -> FROM Customers
+    -> GROUP BY address;
++---------------+-----------------+
+| address       | total_customers |
++---------------+-----------------+
+| Hyderabad     |               1 |
+| Ahmedabad     |               1 |
+| Visakhapatnam |               1 |
+| Delhi         |               1 |
+| Lucknow       |               1 |
+| Jaipur        |               1 |
+| Bangalore     |               1 |
+| Chennai       |               1 |
++---------------+-----------------+
+8 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 8. Find maximum and minimum account balance
+mysql> SELECT MAX(balance) AS highest_balance,
+    ->        MIN(balance) AS lowest_balance
+    -> FROM Accounts;
++-----------------+----------------+
+| highest_balance | lowest_balance |
++-----------------+----------------+
+|        60000.00 |       15000.00 |
++-----------------+----------------+
+1 row in set (0.00 sec)
+
+mysql> -- 9. Display customer name, bank name, and account balance
+mysql> SELECT c.customer_name,
+    ->        b.bank_name,
+    ->        a.balance
+    -> FROM Customers c
+    -> JOIN Accounts a
+    -> ON c.customer_id = a.customer_id
+    -> JOIN Banks b
+    -> ON a.bank_id = b.bank_id;
++---------------+----------------------+----------+
+| customer_name | bank_name            | balance  |
++---------------+----------------------+----------+
+| Rahul Sharma  | State Bank of India  | 25000.00 |
+| Rahul Sharma  | State Bank of India  | 25000.00 |
+| Sneha Patel   | HDFC Bank            | 40000.00 |
+| Sneha Patel   | HDFC Bank            | 40000.00 |
+| Kiran Reddy   | State Bank of India  | 15000.00 |
+| Kiran Reddy   | State Bank of India  | 15000.00 |
+| Priya Gupta   | ICICI Bank           | 30000.00 |
+| Priya Gupta   | ICICI Bank           | 30000.00 |
+| Amit Kumar    | Punjab National Bank | 55000.00 |
+| Amit Kumar    | Punjab National Bank | 55000.00 |
+| Neha Singh    | Bank of Baroda       | 20000.00 |
+| Neha Singh    | Bank of Baroda       | 20000.00 |
+| Vikram Rao    | Canara Bank          | 45000.00 |
+| Vikram Rao    | Canara Bank          | 45000.00 |
+| Divya Joshi   | Axis Bank            | 60000.00 |
+| Divya Joshi   | Axis Bank            | 60000.00 |
++---------------+----------------------+----------+
+16 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 10. Show total transaction amount for each account having total > 5000
+mysql> SELECT account_id,
+    ->        SUM(amount) AS total_transaction
+    -> FROM Transactions
+    -> GROUP BY account_id
+    -> HAVING SUM(amount) > 5000;
++------------+-------------------+
+| account_id | total_transaction |
++------------+-------------------+
+|          2 |          10000.00 |
+|          4 |           6000.00 |
+|          5 |          20000.00 |
++------------+-------------------+
+3 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 11. Display customer details with account balance in descending order
+mysql> SELECT c.customer_name,
+    ->        a.account_type,
+    ->        a.balance
+    -> FROM Customers c
+    -> JOIN Accounts a
+    -> ON c.customer_id = a.customer_id
+    -> ORDER BY a.balance DESC;
++---------------+--------------+----------+
+| customer_name | account_type | balance  |
++---------------+--------------+----------+
+| Divya Joshi   | Current      | 60000.00 |
+| Divya Joshi   | Current      | 60000.00 |
+| Amit Kumar    | Current      | 55000.00 |
+| Amit Kumar    | Current      | 55000.00 |
+| Vikram Rao    | Savings      | 45000.00 |
+| Vikram Rao    | Savings      | 45000.00 |
+| Sneha Patel   | Current      | 40000.00 |
+| Sneha Patel   | Current      | 40000.00 |
+| Priya Gupta   | Savings      | 30000.00 |
+| Priya Gupta   | Savings      | 30000.00 |
+| Rahul Sharma  | Savings      | 25000.00 |
+| Rahul Sharma  | Savings      | 25000.00 |
+| Neha Singh    | Savings      | 20000.00 |
+| Neha Singh    | Savings      | 20000.00 |
+| Kiran Reddy   | Savings      | 15000.00 |
+| Kiran Reddy   | Savings      | 15000.00 |
++---------------+--------------+----------+
+16 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 12. Show bank-wise total balances sorted by highest total balance
+mysql> SELECT b.bank_name,
+    ->        SUM(a.balance) AS total_balance
+    -> FROM Banks b
+    -> JOIN Accounts a
+    -> ON b.bank_id = a.bank_id
+    -> GROUP BY b.bank_name
+    -> ORDER BY total_balance DESC;
++----------------------+---------------+
+| bank_name            | total_balance |
++----------------------+---------------+
+| Axis Bank            |     120000.00 |
+| Punjab National Bank |     110000.00 |
+| Canara Bank          |      90000.00 |
+| State Bank of India  |      80000.00 |
+| HDFC Bank            |      80000.00 |
+| ICICI Bank           |      60000.00 |
+| Bank of Baroda       |      40000.00 |
++----------------------+---------------+
+7 rows in set (0.00 sec)
+
