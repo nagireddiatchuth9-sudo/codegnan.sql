@@ -1,0 +1,475 @@
+mysql> -- CREATE DATABASE
+mysql> CREATE DATABASE IF NOT EXISTS bookstore_db;
+Query OK, 1 row affected, 1 warning (0.01 sec)
+
+mysql> USE bookstore_db;
+Database changed
+mysql> 
+mysql> -- TABLE 1: AUTHORS
+mysql> CREATE TABLE Authors (
+    ->     author_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     author_name VARCHAR(100) NOT NULL,
+    ->     bio TEXT
+    -> );
+ERROR 1050 (42S01): Table 'authors' already exists
+mysql> 
+mysql> -- TABLE 2: GENRES
+mysql> CREATE TABLE Genres (
+    ->     genre_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     genre_name VARCHAR(50) NOT NULL
+    -> );
+ERROR 1050 (42S01): Table 'genres' already exists
+mysql> 
+mysql> -- TABLE 3: CUSTOMERS
+mysql> CREATE TABLE Customers (
+    ->     customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     name VARCHAR(100),
+    ->     email VARCHAR(100) UNIQUE,
+    ->     city VARCHAR(50),
+    ->     join_date DATE
+    -> );
+ERROR 1050 (42S01): Table 'customers' already exists
+mysql> 
+mysql> -- TABLE 4: BOOKS
+mysql> CREATE TABLE Books (
+    ->     book_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     title VARCHAR(150),
+    ->     price DECIMAL(10,2),
+    ->     stock_quantity INT,
+    ->     author_id INT,
+    ->     genre_id INT,
+    ->     FOREIGN KEY (author_id) REFERENCES Authors(author_id),
+    ->     FOREIGN KEY (genre_id) REFERENCES Genres(genre_id)
+    -> );
+ERROR 1050 (42S01): Table 'books' already exists
+mysql> 
+mysql> -- TABLE 5: ORDERS
+mysql> CREATE TABLE Orders (
+    ->     order_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     order_date DATE,
+    ->     customer_id INT,
+    ->     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+    -> );
+ERROR 1050 (42S01): Table 'orders' already exists
+mysql> 
+mysql> -- TABLE 6: ORDER_DETAILS
+mysql> CREATE TABLE Order_Details (
+    ->     detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     order_id INT,
+    ->     book_id INT,
+    ->     quantity_ordered INT,
+    ->     price_at_time_of_order DECIMAL(10,2),
+    ->     FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    ->     FOREIGN KEY (book_id) REFERENCES Books(book_id)
+    -> );
+ERROR 1050 (42S01): Table 'order_details' already exists
+mysql> 
+mysql> -- AUTHORS (4 ORIGINAL + 4 NEW)
+mysql> INSERT INTO Authors (author_name, bio) VALUES
+    -> ('Chetan Bhagat', 'Indian author known for 5 Point Someone.'),
+    -> ('Arundhati Roy', 'Winner of the Man Booker Prize.'),
+    -> ('R.K. Narayan', 'Creator of Malgudi Days.'),
+    -> ('Amish Tripathi', 'Known for the Shiva Trilogy.'),
+    -> ('Paulo Coelho', 'Brazilian author of The Alchemist.'),
+    -> ('George Orwell', 'Known for dystopian classics.'),
+    -> ('Agatha Christie', 'Famous mystery novelist.'),
+    -> ('Ravi Subramanian', 'Indian banking thriller writer.');
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- GENRES (4 ORIGINAL + 4 NEW)
+mysql> INSERT INTO Genres (genre_name) VALUES
+    -> ('Fiction'),
+    -> ('Mythology'),
+    -> ('History'),
+    -> ('Romance'),
+    -> ('Mystery'),
+    -> ('Horror'),
+    -> ('Drama'),
+    -> ('Philosophy');
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- CUSTOMERS (4 ORIGINAL + 4 NEW)
+mysql> INSERT INTO Customers (name, email, city, join_date) VALUES
+    -> ('Aarav Sharma', 'aarav@gmail.com', 'Mumbai', '2023-01-10'),
+    -> ('Diya Patel', 'diya@yahoo.com', 'Ahmedabad', '2023-02-15'),
+    -> ('Vihaan Reddy', 'vihaan@outlook.com', 'Hyderabad', '2023-03-20'),
+    -> ('Ananya Gupta', 'ananya@gmail.com', 'Delhi', '2023-04-05'),
+    -> ('Ritika Singh', 'ritika.s@gmail.com', 'Jaipur', '2024-01-10'),
+    -> ('Manish Kumar', 'manish.k@gmail.com', 'Lucknow', '2024-02-15'),
+    -> ('Sanjana Rao', 'sanjana.r@yahoo.com', 'Mysore', '2024-03-20'),
+    -> ('Aditya Joshi', 'aditya.j@outlook.com', 'Indore', '2024-04-05');
+ERROR 1062 (23000): Duplicate entry 'aarav@gmail.com' for key 'customers.email'
+mysql> 
+mysql> -- BOOKS (4 ORIGINAL + 4 NEW ONLY)
+mysql> INSERT INTO Books (title, price, stock_quantity, author_id, genre_id) VALUES
+    -> ('Five Point Someone', 250.00, 50, 1, 1),
+    -> ('2 States', 300.00, 40, 1, 4),
+    -> ('The God of Small Things', 450.00, 20, 2, 1),
+    -> ('Malgudi Days', 200.00, 100, 3, 1),
+    -> ('The Alchemist', 500.00, 35, 5, 8),
+    -> ('1984', 399.00, 40, 6, 8),
+    -> ('Murder on the Orient Express', 450.00, 25, 7, 5),
+    -> ('Bankerupt', 380.00, 30, 8, 5);
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- ORDERS (4 ORIGINAL + 4 NEW ONLY)
+mysql> INSERT INTO Orders (order_date, customer_id) VALUES
+    -> ('2023-05-01', 1),
+    -> ('2023-05-03', 2),
+    -> ('2023-05-05', 1),
+    -> ('2023-06-01', 3),
+    -> ('2023-07-15', 5),
+    -> ('2023-08-20', 6),
+    -> ('2023-09-05', 7),
+    -> ('2023-09-25', 8);
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- ORDER DETAILS (4 ORIGINAL + 4 NEW ONLY)
+mysql> INSERT INTO Order_Details (order_id, book_id, quantity_ordered, price_at_time_of_order) VALUES
+    -> (1, 1, 1, 250.00),
+    -> (1, 4, 2, 200.00),
+    -> (2, 2, 1, 300.00),
+    -> (3, 3, 1, 450.00),
+    -> (4, 5, 1, 500.00),
+    -> (5, 6, 2, 399.00),
+    -> (6, 7, 1, 450.00),
+    -> (7, 8, 3, 380.00);
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- VERIFY DATA
+mysql> SELECT * FROM Authors;
++-----------+------------------+------------------------------------------+
+| author_id | author_name      | bio                                      |
++-----------+------------------+------------------------------------------+
+|         1 | Chetan Bhagat    | Indian author known for 5 Point Someone. |
+|         2 | Arundhati Roy    | Winner of the Man Booker Prize.          |
+|         3 | R.K. Narayan     | Creator of Malgudi Days.                 |
+|         4 | Amish Tripathi   | Known for the Shiva Trilogy.             |
+|         5 | Paulo Coelho     | Brazilian author of The Alchemist.       |
+|         6 | George Orwell    | Known for dystopian classics.            |
+|         7 | Agatha Christie  | Famous mystery novelist.                 |
+|         8 | Ravi Subramanian | Indian banking thriller writer.          |
+|         9 | Chetan Bhagat    | Indian author known for 5 Point Someone. |
+|        10 | Arundhati Roy    | Winner of the Man Booker Prize.          |
+|        11 | R.K. Narayan     | Creator of Malgudi Days.                 |
+|        12 | Amish Tripathi   | Known for the Shiva Trilogy.             |
+|        13 | Paulo Coelho     | Brazilian author of The Alchemist.       |
+|        14 | George Orwell    | Known for dystopian classics.            |
+|        15 | Agatha Christie  | Famous mystery novelist.                 |
+|        16 | Ravi Subramanian | Indian banking thriller writer.          |
++-----------+------------------+------------------------------------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Genres;
++----------+------------+
+| genre_id | genre_name |
++----------+------------+
+|        1 | Fiction    |
+|        2 | Mythology  |
+|        3 | History    |
+|        4 | Romance    |
+|        5 | Mystery    |
+|        6 | Horror     |
+|        7 | Drama      |
+|        8 | Philosophy |
+|        9 | Fiction    |
+|       10 | Mythology  |
+|       11 | History    |
+|       12 | Romance    |
+|       13 | Mystery    |
+|       14 | Horror     |
+|       15 | Drama      |
+|       16 | Philosophy |
++----------+------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Customers;
++-------------+--------------+----------------------+-----------+------------+
+| customer_id | name         | email                | city      | join_date  |
++-------------+--------------+----------------------+-----------+------------+
+|           1 | Aarav Sharma | aarav@gmail.com      | Mumbai    | 2023-01-10 |
+|           2 | Diya Patel   | diya@yahoo.com       | Ahmedabad | 2023-02-15 |
+|           3 | Vihaan Reddy | vihaan@outlook.com   | Hyderabad | 2023-03-20 |
+|           4 | Ananya Gupta | ananya@gmail.com     | Delhi     | 2023-04-05 |
+|           5 | Ritika Singh | ritika.s@gmail.com   | Jaipur    | 2024-01-10 |
+|           6 | Manish Kumar | manish.k@gmail.com   | Lucknow   | 2024-02-15 |
+|           7 | Sanjana Rao  | sanjana.r@yahoo.com  | Mysore    | 2024-03-20 |
+|           8 | Aditya Joshi | aditya.j@outlook.com | Indore    | 2024-04-05 |
++-------------+--------------+----------------------+-----------+------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Books;
++---------+------------------------------+--------+----------------+-----------+----------+
+| book_id | title                        | price  | stock_quantity | author_id | genre_id |
++---------+------------------------------+--------+----------------+-----------+----------+
+|       1 | Five Point Someone           | 250.00 |             50 |         1 |        1 |
+|       2 | 2 States                     | 300.00 |             40 |         1 |        4 |
+|       3 | The God of Small Things      | 450.00 |             20 |         2 |        1 |
+|       4 | Malgudi Days                 | 200.00 |            100 |         3 |        1 |
+|       5 | The Alchemist                | 500.00 |             35 |         5 |        8 |
+|       6 | 1984                         | 399.00 |             40 |         6 |        8 |
+|       7 | Murder on the Orient Express | 450.00 |             25 |         7 |        5 |
+|       8 | Bankerupt                    | 380.00 |             30 |         8 |        5 |
+|       9 | Five Point Someone           | 250.00 |             50 |         1 |        1 |
+|      10 | 2 States                     | 300.00 |             40 |         1 |        4 |
+|      11 | The God of Small Things      | 450.00 |             20 |         2 |        1 |
+|      12 | Malgudi Days                 | 200.00 |            100 |         3 |        1 |
+|      13 | The Alchemist                | 500.00 |             35 |         5 |        8 |
+|      14 | 1984                         | 399.00 |             40 |         6 |        8 |
+|      15 | Murder on the Orient Express | 450.00 |             25 |         7 |        5 |
+|      16 | Bankerupt                    | 380.00 |             30 |         8 |        5 |
++---------+------------------------------+--------+----------------+-----------+----------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Orders;
++----------+------------+-------------+
+| order_id | order_date | customer_id |
++----------+------------+-------------+
+|        1 | 2023-05-01 |           1 |
+|        2 | 2023-05-03 |           2 |
+|        3 | 2023-05-05 |           1 |
+|        4 | 2023-06-01 |           3 |
+|        5 | 2023-07-15 |           5 |
+|        6 | 2023-08-20 |           6 |
+|        7 | 2023-09-05 |           7 |
+|        8 | 2023-09-25 |           8 |
+|        9 | 2023-05-01 |           1 |
+|       10 | 2023-05-03 |           2 |
+|       11 | 2023-05-05 |           1 |
+|       12 | 2023-06-01 |           3 |
+|       13 | 2023-07-15 |           5 |
+|       14 | 2023-08-20 |           6 |
+|       15 | 2023-09-05 |           7 |
+|       16 | 2023-09-25 |           8 |
++----------+------------+-------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Order_Details;
++-----------+----------+---------+------------------+------------------------+
+| detail_id | order_id | book_id | quantity_ordered | price_at_time_of_order |
++-----------+----------+---------+------------------+------------------------+
+|         1 |        1 |       1 |                1 |                 250.00 |
+|         2 |        1 |       4 |                2 |                 200.00 |
+|         3 |        2 |       2 |                1 |                 300.00 |
+|         4 |        3 |       3 |                1 |                 450.00 |
+|         5 |        4 |       5 |                1 |                 500.00 |
+|         6 |        5 |       6 |                2 |                 399.00 |
+|         7 |        6 |       7 |                1 |                 450.00 |
+|         8 |        7 |       8 |                3 |                 380.00 |
+|         9 |        1 |       1 |                1 |                 250.00 |
+|        10 |        1 |       4 |                2 |                 200.00 |
+|        11 |        2 |       2 |                1 |                 300.00 |
+|        12 |        3 |       3 |                1 |                 450.00 |
+|        13 |        4 |       5 |                1 |                 500.00 |
+|        14 |        5 |       6 |                2 |                 399.00 |
+|        15 |        6 |       7 |                1 |                 450.00 |
+|        16 |        7 |       8 |                3 |                 380.00 |
++-----------+----------+---------+------------------+------------------------+
+16 rows in set (0.00 sec)
+
+mysql> -- 1. Books priced between 300 and 450
+mysql> SELECT title, price
+    -> FROM Books
+    -> WHERE price BETWEEN 300 AND 450;
++------------------------------+--------+
+| title                        | price  |
++------------------------------+--------+
+| 2 States                     | 300.00 |
+| The God of Small Things      | 450.00 |
+| 1984                         | 399.00 |
+| Murder on the Orient Express | 450.00 |
+| Bankerupt                    | 380.00 |
+| 2 States                     | 300.00 |
+| The God of Small Things      | 450.00 |
+| 1984                         | 399.00 |
+| Murder on the Orient Express | 450.00 |
+| Bankerupt                    | 380.00 |
++------------------------------+--------+
+10 rows in set (0.01 sec)
+
+mysql> 
+mysql> -- 2. Customers from cities starting with 'M'
+mysql> SELECT name, city
+    -> FROM Customers
+    -> WHERE city LIKE 'M%';
++--------------+--------+
+| name         | city   |
++--------------+--------+
+| Aarav Sharma | Mumbai |
+| Sanjana Rao  | Mysore |
++--------------+--------+
+2 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 3. Books not having stock more than 50
+mysql> SELECT title, stock_quantity
+    -> FROM Books
+    -> WHERE NOT stock_quantity > 50;
++------------------------------+----------------+
+| title                        | stock_quantity |
++------------------------------+----------------+
+| Five Point Someone           |             50 |
+| 2 States                     |             40 |
+| The God of Small Things      |             20 |
+| The Alchemist                |             35 |
+| 1984                         |             40 |
+| Murder on the Orient Express |             25 |
+| Bankerupt                    |             30 |
+| Five Point Someone           |             50 |
+| 2 States                     |             40 |
+| The God of Small Things      |             20 |
+| The Alchemist                |             35 |
+| 1984                         |             40 |
+| Murder on the Orient Express |             25 |
+| Bankerupt                    |             30 |
++------------------------------+----------------+
+14 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 4. Order details where quantity is exactly 1
+mysql> SELECT *
+    -> FROM Order_Details
+    -> WHERE quantity_ordered = 1;
++-----------+----------+---------+------------------+------------------------+
+| detail_id | order_id | book_id | quantity_ordered | price_at_time_of_order |
++-----------+----------+---------+------------------+------------------------+
+|         1 |        1 |       1 |                1 |                 250.00 |
+|         3 |        2 |       2 |                1 |                 300.00 |
+|         4 |        3 |       3 |                1 |                 450.00 |
+|         5 |        4 |       5 |                1 |                 500.00 |
+|         7 |        6 |       7 |                1 |                 450.00 |
+|         9 |        1 |       1 |                1 |                 250.00 |
+|        11 |        2 |       2 |                1 |                 300.00 |
+|        12 |        3 |       3 |                1 |                 450.00 |
+|        13 |        4 |       5 |                1 |                 500.00 |
+|        15 |        6 |       7 |                1 |                 450.00 |
++-----------+----------+---------+------------------+------------------------+
+10 rows in set (0.00 sec)
+
+mysql> -- 5. Total books in each genre
+mysql> SELECT g.genre_name, COUNT(b.book_id) AS total_books
+    -> FROM Genres g
+    -> JOIN Books b ON g.genre_id = b.genre_id
+    -> GROUP BY g.genre_name;
++------------+-------------+
+| genre_name | total_books |
++------------+-------------+
+| Fiction    |           6 |
+| Romance    |           2 |
+| Mystery    |           4 |
+| Philosophy |           4 |
++------------+-------------+
+4 rows in set (0.01 sec)
+
+mysql> 
+mysql> -- 6. Total revenue from all orders
+mysql> SELECT SUM(quantity_ordered * price_at_time_of_order) AS total_revenue
+    -> FROM Order_Details;
++---------------+
+| total_revenue |
++---------------+
+|       8576.00 |
++---------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> -- 7. Average stock of books
+mysql> SELECT AVG(stock_quantity) AS avg_stock
+    -> FROM Books;
++-----------+
+| avg_stock |
++-----------+
+|   42.5000 |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> -- 8. Year-wise customer count
+mysql> SELECT YEAR(join_date) AS join_year, COUNT(customer_id) AS total_customers
+    -> FROM Customers
+    -> GROUP BY YEAR(join_date);
++-----------+-----------------+
+| join_year | total_customers |
++-----------+-----------------+
+|      2023 |               4 |
+|      2024 |               4 |
++-----------+-----------------+
+2 rows in set (0.00 sec)
+
+mysql> -- 9. Customers who ordered 2 or more different books
+mysql> SELECT c.name, COUNT(DISTINCT od.book_id) AS books_ordered
+    -> FROM Customers c
+    -> JOIN Orders o ON c.customer_id = o.customer_id
+    -> JOIN Order_Details od ON o.order_id = od.order_id
+    -> GROUP BY c.name
+    -> HAVING COUNT(DISTINCT od.book_id) >= 2;
++--------------+---------------+
+| name         | books_ordered |
++--------------+---------------+
+| Aarav Sharma |             3 |
++--------------+---------------+
+1 row in set (0.01 sec)
+
+mysql> 
+mysql> -- 10. Authors with more than 1 book
+mysql> SELECT a.author_name, COUNT(b.book_id) AS total_books
+    -> FROM Authors a
+    -> JOIN Books b ON a.author_id = b.author_id
+    -> GROUP BY a.author_name
+    -> HAVING COUNT(b.book_id) > 1;
++------------------+-------------+
+| author_name      | total_books |
++------------------+-------------+
+| Chetan Bhagat    |           4 |
+| Arundhati Roy    |           2 |
+| R.K. Narayan     |           2 |
+| Paulo Coelho     |           2 |
+| George Orwell    |           2 |
+| Agatha Christie  |           2 |
+| Ravi Subramanian |           2 |
++------------------+-------------+
+7 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 11. Top 3 most expensive books
+mysql> SELECT title, price
+    -> FROM Books
+    -> ORDER BY price DESC
+    -> LIMIT 3;
++-------------------------+--------+
+| title                   | price  |
++-------------------------+--------+
+| The Alchemist           | 500.00 |
+| The Alchemist           | 500.00 |
+| The God of Small Things | 450.00 |
++-------------------------+--------+
+3 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- 12. Total books sold per genre (highest first)
+mysql> SELECT g.genre_name, SUM(od.quantity_ordered) AS total_sold
+    -> FROM Genres g
+    -> JOIN Books b ON g.genre_id = b.genre_id
+    -> JOIN Order_Details od ON b.book_id = od.book_id
+    -> GROUP BY g.genre_name
+    -> ORDER BY total_sold DESC;
++------------+------------+
+| genre_name | total_sold |
++------------+------------+
+| Fiction    |          8 |
+| Mystery    |          8 |
+| Philosophy |          6 |
+| Romance    |          2 |
++------------+------------+
+4 rows in set (0.00 sec)
+
